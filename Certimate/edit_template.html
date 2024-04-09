@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+    <title>Interactive Template Editing</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <div class="header1">
+        <h1>Template Customization</h1>
+    </div>
+    <label for="template">Choose a template:</label>
+    <select id="template" onchange="loadTemplate()">
+        <option value="/templates/1.png">Template 1</option>
+        <option value="/templates/2.png">Template 2</option>
+        <option value="/templates/3.png">Template 3</option>
+        <option value="/templates/4.png">Template 4</option>
+        <option value="/templates/5.png">Template 5</option>
+        <option value="/templates/6.png">Template 6</option>
+        <option value="/templates/7.png">Template 7</option>
+        <option value="/templates/8.png">Template 8</option>
+        <option value="/templates/9.png">Template 9</option>
+        <option value="/templates/10.png">Template 10</option>
+        <option value="/templates/11.png">Template 11</option>
+        <option value="/templates/12.png">Template 12</option>
+        <option value="/templates/13.png">Template 13</option>
+        <option value="/templates/14.png">Template 14</option>
+        <option value="/templates/15.png">Template 15</option>
+        <option value="/templates/16.png">Template 16</option>
+        <option value="/templates/17.png">Template 17</option>
+        <option value="/templates/18.png">Template 18</option>
+        <option value="/templates/19.png">Template 19</option>
+        <option value="/templates/20.png">Template 20</option>
+        <option value="/templates/21.png">Template 21</option>
+        <option value="/templates/22.png">Template 22</option>
+        <option value="/templates/23.png">Template 23</option>
+        <option value="/templates/24.png">Template 24</option>
+        <option value="/templates/25.png">Template 25</option>
+    </select>
+    <br><br>
+    <canvas id="imageCanvas" width="800" height="600"></canvas>
+    <br>
+    <label for="descriptionInput">Description:</label>
+    <input type="text" id="descriptionInput">
+    <br>
+    <label for="dateInput">Date:</label>
+    <input type="text" id="dateInput">
+    <br>
+    <label for="signInput">Sign:</label>
+    <input type="text" id="signInput">
+    <br>
+    <label for="fontSize">Font Size:</label>
+    <input type="number" id="fontSize" min="8" max="72" value="16">
+    <br>
+    <label for="fontFamily">Font Family:</label>
+    <select id="fontFamily">
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="Luminari">Luminari</option>
+        <option value="Comic Sans MS">Comic Sans MS</option>
+        <option value="Bradley Hand">Bradley Hand</option>
+        <option value="Helvetica">Helvetica</option>
+        <option value="Gill Sans">Gill Sans</option>
+        <option value="Lucida">Lucida</option>
+        <option value="Brush Script MT">Brush Script MT</option>
+        <option value="Lucida">Lucida</option>
+        <option value="Calibri">Calibri</option>
+        <option value="Copperplate">Copperplate</option>
+        <option value="Cookie">Cookie</option>
+    </select>
+    <br>
+    <button onclick="addText('description')">Add Description</button>
+    <button onclick="addText('date')">Add Date</button>
+    <button onclick="addText('sign')">Add Sign</button>
+    <br>
+    <button onclick="saveImage()">Save Image</button>
+   
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        let texts = []; // Array to store text objects
+        let selectedText = null;
+        let isDragging = false;
+        let prevX, prevY;
+
+        function loadTemplate() {
+            const template = document.getElementById('template').value;
+            const templateImage = new Image();
+            templateImage.onload = function () {
+                const aspectRatio = templateImage.width / templateImage.height;
+                let newWidth, newHeight;
+
+                if (aspectRatio > canvas.width / canvas.height) {
+                    newWidth = canvas.width;
+                    newHeight = canvas.width / aspectRatio;
+                } else {
+                    newWidth = canvas.height * aspectRatio;
+                    newHeight = canvas.height;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(templateImage, 0, 0, newWidth, newHeight);
+                texts.forEach(text => {
+                    ctx.font = text.fontSize + ' ' + text.fontFamily;
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(text.text, text.x, text.y);
+                });
+            };
+            templateImage.src = template;
+        }
+
+        function addText(type) {
+            const textInput = document.getElementById(type + 'Input').value;
+            const fontSize = document.getElementById('fontSize').value + 'px';
+            const fontFamily = document.getElementById('fontFamily').value;
+            const xCoord = Math.random() * (canvas.width - 100); // Random X coordinate
+            const yCoord = Math.random() * (canvas.height - 20) + 20; // Random Y coordinate
+
+            ctx.font = fontSize + ' ' + fontFamily;
+            ctx.fillStyle = 'black';
+            ctx.fillText(textInput, xCoord, yCoord);
+
+            texts.push({ type, text: textInput, x: xCoord, y: yCoord, fontSize, fontFamily });
+            loadTemplate(); // Redraw canvas with updated text
+        }
+
+        function saveImage() {
+            const imageData = canvas.toDataURL('image/jpeg', 1); // Quality: 1 (maximum)
+
+            // Download the edited image as a JPG file (optional)
+            const link = document.createElement('a');
+            link.href = imageData;
+            link.download = 'edited_image.jpg'; // Set filename for the downloaded image
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        canvas.addEventListener('mousedown', function (e) {
+            const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+            const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+
+            texts.forEach(text => {
+                if (
+                    mouseX >= text.x &&
+                    mouseX <= text.x + ctx.measureText(text.text).width &&
+                    mouseY >= text.y - parseInt(text.fontSize) &&
+                    mouseY <= text.y
+                ) {
+                    isDragging = true;
+                    selectedText = text;
+                    prevX = mouseX - text.x;
+                    prevY = mouseY - text.y;
+                }
+            });
+        });
+
+        canvas.addEventListener('mousemove', function (e) {
+            if (isDragging && selectedText !== null) {
+                const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+                const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+
+                selectedText.x = mouseX - prevX;
+                selectedText.y = mouseY - prevY;
+
+                loadTemplate(); // Redraw canvas with updated text position
+            }
+        });
+
+        canvas.addEventListener('mouseup', function () {
+            isDragging = false;
+            selectedText = null;
+        });
+
+        window.onload = loadTemplate;
+    </script>
+    <hr class="partition-line">
+    <div class="options">
+      <button onclick="location.href='index.html'">Home</button>
+      <button onclick="location.href='edit_template.html'">Edit Template</button>
+      <button onclick="location.href='generate_certificate.html'">Generate Certificate</button>
+      <button onclick="location.href='feedback.html'">FeedBack</button>
+    </div>
+</body>
+</html>
