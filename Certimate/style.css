@@ -98,6 +98,52 @@ input[type=text], select, textarea {
     cursor: pointer;
     border-radius: 30px ;
   }
+
+  button {
+    appearance: auto;
+    font-style: normal;
+    font-size : 16px ;
+    text-rendering: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: center;
+    align-items: flex-start;
+    cursor: default;
+    box-sizing: border-box;
+    margin: 0em;
+    padding-block: 1px;
+    padding-inline: 6px;
+    border-width: 2px;
+    border-style: outset;
+    border-radius: 20px;
+    border-color: buttonborder;
+    border-image: initial;
+  }
+
+  input[type="file" i] {
+    appearance: none;
+    cursor: default;
+    align-items: baseline;
+    background-color: #ffffff;
+    text-overflow: ellipsis;
+    text-align: start !important;
+    padding: initial;
+    border: initial;
+    white-space: pre;
+    overflow: hidden !important;
+    border-radius: 20px ;
+  }
+  input[type="number" i] {
+    padding-block: 1px;
+    padding-inline: 2px;
+    border-radius: 20px ;
+  }
+
   .container {
     border-radius: 5px;
     background-color:#39b0d4;
@@ -132,6 +178,20 @@ input[type=text], select, textarea {
     color: #0e0d0d;
     padding: 10px;
     text-align: center;
+}
+
+input[type="text"], select, textarea {
+  width: 50%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+  padding: 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(204, 204, 204);
+  border-image: initial;
+  border-radius: 20px;
 }
 
 .article-list{
