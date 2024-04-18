@@ -10,7 +10,7 @@ This project is designed to provide a user-friendly interface for customizing te
 - Image Upload: Upload images and position them within the template.
 - Undo Functionality: Undo the last operation to revert changes.
 - Save Image: Save the customized template as an image file.
-- 
+  
 ## Technologies Used
 - HTML5
 - CSS3
