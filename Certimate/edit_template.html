@@ -20,7 +20,7 @@
         <h1>Template Customization</h1>
     </div>
     <label for="template"><b>Choose a template:</b></label>
-    <select id="template" onchange="loadTemplate()">
+    <select id="template" onchange="loadCustomTemplate()">
         <option value="/templates/1.png">Template 1</option>
         <option value="/templates/2.png">Template 2</option>
         <option value="/templates/3.png">Template 3</option>
@@ -47,7 +47,11 @@
         <option value="/templates/24.png">Template 24</option>
         <option value="/templates/25.png">Template 25</option>
     </select>
+    <input type="file" id="customTemplateInput" accept="image/*">
+    <button onclick="uploadCustomTemplate()">Upload Template</button>
+
     <br><br>
+   
     <canvas id="imageCanvas" width="800" height="600"></canvas>
     <br>
     <label for="descriptionInput"><b>Description:</b></label>
@@ -59,9 +63,15 @@
     <label for="signInput"><b>Sign:</b></label>
     <input type="text" id="signInput">
     <br>
+    <span style="font-size: 20px;">(Upload sign after removing background.
+        <br>You can visit https://www.remove.bg/b/remove-logo-backgrounds for the same.)
+    </span>
     <br>
-    <label for="signInput"><b>Sign:</b></label>
-    <input type="file" id="signInput" accept="image/*" onchange="uploadSignImage(event)">
+    <label for="imageFileInput1"><b>Sign 1:</b></label>
+    <input type="file" id="imageFileInput1" accept="image/*">
+    <br>
+    <label for="imageFileInput2"><b>Sign 2:</b></label>
+    <input type="file" id="imageFileInput2" accept="image/*">
     <br>
     <label for="fontSize"><b>Font Size:</b></label>
     <input type="number" id="fontSize" min="8" max="72" value="16">
@@ -83,14 +93,13 @@
         <option value="Lucida">Lucida</option>
         <option value="Calibri">Calibri</option>
     </select>
-    <br>
     <button onclick="addText('description')"><b>Add Description</b></button>
-    <br>
     <button onclick="addText('date')"><b>Add Date</b></button>
-    <br>
     <button onclick="addText('sign')"><b>Add Sign</b></button>
     <br>
-    <button onclick="addSignImage()"><b>Add Sign Image</b></button>
+    <button onclick="uploadImage('imageFileInput1')"><b>Add Sign 1 Image</b></button>
+    <button onclick="uploadImage('imageFileInput2')"><b>Add Sign 2 Image</b></button>
+    <button onclick="undoLastOperation()"><b>Undo</b></button>
     <br>
     <br>
     <br>
@@ -129,6 +138,42 @@
             };
             templateImage.src = template;
         }
+        function uploadCustomTemplate() {
+            const customTemplateInput = document.getElementById('customTemplateInput');
+            const uploadedTemplate = customTemplateInput.files[0];
+
+            if (!uploadedTemplate) {
+                alert('Please select a template file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const template = e.target.result;
+
+                // Add the custom template to the dropdown menu
+                const option = document.createElement('option');
+                option.value = template;
+                option.text = 'Custom Template ' + (document.getElementById('template').options.length + 1); // Next template number
+                document.getElementById('template').add(option);
+            };
+            reader.readAsDataURL(uploadedTemplate);
+        }
+
+        function loadCustomTemplate() {
+            const customTemplate = document.getElementById('template').value;
+
+            // Load the custom template in the canvas
+            const customTemplateImage = new Image();
+            customTemplateImage.onload = function () {
+                // Draw the custom template on the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(customTemplateImage, 0, 0, canvas.width, canvas.height);
+                // Additional code to handle other elements on the canvas if needed
+            };
+            customTemplateImage.src = customTemplate;
+        }
+
 
         function addText(type) {
             const textInput = document.getElementById(type + 'Input').value;
@@ -138,12 +183,12 @@
             const yCoord = Math.random() * (canvas.height - 20) + 20; // Random Y coordinate
 
             ctx.font = fontSize + ' ' + fontFamily;
-            ctx.fillStyle = 'black';
-            ctx.fillText(textInput, xCoord, yCoord);
+            ctx.fillStyle = 'black'; // Set text color
+            ctx.fillText(textInput, xCoord, yCoord); // Draw text on canvas
 
-            texts.push({ type, text: textInput, x: xCoord, y: yCoord, fontSize, fontFamily });
-            loadTemplate(); // Redraw canvas with updated text
+            texts.push({ type: 'text', text: textInput, x: xCoord, y: yCoord, fontSize, fontFamily });
         }
+
     
         function saveImage() {
             const imageData = canvas.toDataURL('image/jpeg', 1); // Quality: 1 (maximum)
@@ -157,7 +202,74 @@
             document.body.removeChild(link);
         }
 
-        canvas.addEventListener('mousedown', function (e) {
+        function uploadImage(inputId) {
+            const imageFileInput = document.getElementById(inputId);
+            const uploadedImage = imageFileInput.files[0]; // Get the uploaded image
+
+            if (!uploadedImage) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const image = new Image();
+                image.onload = function () {
+                    const aspectRatio = image.width / image.height;
+                    let newWidth = 100;
+                    let newHeight = 25;
+
+                    if (aspectRatio > newWidth / newHeight) {
+                        newWidth = newHeight * aspectRatio;
+                    } else {
+                        newHeight = newWidth / aspectRatio;
+                    }
+
+                    const xCoord = Math.random() * (canvas.width - newWidth);
+                    const yCoord = Math.random() * (canvas.height - newHeight);
+
+                    texts.push({ type: 'image', image: image, x: xCoord, y: yCoord, width: newWidth, height: newHeight });
+
+                    // Redraw canvas with the updated image
+                    loadTemplate();
+                };
+                image.src = e.target.result;
+            };
+            reader.readAsDataURL(uploadedImage);
+        }
+
+        function loadTemplate() {
+            const template = document.getElementById('template').value;
+            const templateImage = new Image();
+            templateImage.onload = function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(templateImage, 0, 0, canvas.width, canvas.height);
+                texts.forEach(text => {
+                    if (text.type === 'image') {
+                        ctx.drawImage(text.image, text.x, text.y, text.width, text.height);
+                    } else if (text.type === 'text') { // Check for text type
+                        ctx.font = text.fontSize + ' ' + text.fontFamily;
+                        ctx.fillStyle = 'black';
+                        ctx.fillText(text.text, text.x, text.y);
+                    }
+                });
+            };
+            templateImage.src = template;
+        }
+
+        function undoLastOperation() {
+            if (texts.length > 0) {
+                texts.pop(); // Remove the last element from the texts array
+
+                // Clear the canvas and redraw the template and remaining text/image elements
+                loadTemplate();
+            }
+        }
+
+        let draggingImage = null;
+
+// Add event listener for mouse down on the canvas
+canvas.addEventListener('mousedown', function (e) {
             const mouseX = e.clientX - canvas.getBoundingClientRect().left;
             const mouseY = e.clientY - canvas.getBoundingClientRect().top;
 
@@ -193,6 +305,42 @@
             selectedText = null;
         });
 
+
+        function handleImageDragging(e) {
+            const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+            const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+
+            texts.forEach(text => {
+                if (text.type === 'image') {
+                    if (
+                        mouseX >= text.x &&
+                        mouseX <= text.x + text.width &&
+                        mouseY >= text.y &&
+                        mouseY <= text.y + text.height
+                    ) {
+                        isDragging = true;
+                        selectedText = text;
+                        prevX = mouseX - text.x;
+                        prevY = mouseY - text.y;
+                    }
+                }
+            });
+        }
+        canvas.addEventListener('mousemove', function (e) {
+            handleImageDragging(e);
+
+            if (isDragging && selectedText !== null) {
+                const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+                const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+
+                selectedText.x = mouseX - prevX;
+                selectedText.y = mouseY - prevY;
+
+                loadTemplate(); // Redraw canvas with updated image position
+            }
+        });
+
+        
         window.onload = loadTemplate;
     </script>
     <hr class="partition-line">
