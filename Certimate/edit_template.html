@@ -7,6 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
     <title>Interactive Template Editing</title>
     <link rel="stylesheet" href="style.css" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Parisienne' rel='stylesheet'>
     <style>
         canvas {
             border: 1px solid #ccc;
@@ -55,7 +56,7 @@
     <canvas id="imageCanvas" width="800" height="600"></canvas>
     <br>
     <label for="descriptionInput"><b>Description:</b></label>
-    <input type="text" id="descriptionInput">
+    <textarea id="descriptionInput" rows="4"></textarea>
     <br>
     <label for="dateInput"><b>Date:</b></label>
     <input type="text" id="dateInput">
@@ -64,7 +65,7 @@
     <input type="text" id="signInput">
     <br>
     <span style="font-size: 20px;">(Upload sign after removing background.
-        <br>You can visit https://www.remove.bg/b/remove-logo-backgrounds for the same.)
+        <br><a href="https://www.photoroom.com/tools/background-remover" target="_blank">Click Here For Background Removal</a>)
     </span>
     <br>
     <label for="imageFileInput1"><b>Sign 1:</b></label>
@@ -82,6 +83,7 @@
         <option value="Times New Roman">Times New Roman</option>
         <option value="Courier New">Courier New</option>
         <option value="Verdana">Verdana</option>
+        <option value="Parisienne">Parisienne</option>
         <option value="Tahoma">Tahoma</option>
         <option value="Luminari">Luminari</option>
         <option value="Comic Sans MS">Comic Sans MS</option>
@@ -180,14 +182,21 @@
             const fontSize = document.getElementById('fontSize').value + 'px';
             const fontFamily = document.getElementById('fontFamily').value;
             const xCoord = Math.random() * (canvas.width - 100); // Random X coordinate
-            const yCoord = Math.random() * (canvas.height - 20) + 20; // Random Y coordinate
+            let yCoord = Math.random() * (canvas.height - 20) + 20; // Random Y coordinate
 
-            ctx.font = fontSize + ' ' + fontFamily;
-            ctx.fillStyle = 'black'; // Set text color
-            ctx.fillText(textInput, xCoord, yCoord); // Draw text on canvas
+            // Split text input into lines
+            const lines = textInput.split('\n');
+            lines.forEach(line => {
+                ctx.font = fontSize + ' ' + fontFamily;
+                ctx.fillStyle = 'black'; // Set text color
+                ctx.fillText(line, xCoord, yCoord); // Draw text on canvas
 
-            texts.push({ type: 'text', text: textInput, x: xCoord, y: yCoord, fontSize, fontFamily });
+                texts.push({ type: 'text', text: line, x: xCoord, y: yCoord, fontSize, fontFamily });
+
+                yCoord += parseInt(fontSize); // Move to next line
+            });
         }
+
 
     
         function saveImage() {
