@@ -20,7 +20,7 @@
     <div class="header1">
         <h1>Template Customization</h1>
     </div>
-    <label for="template" style="font-size: 20px"><b>Choose a template</b></label>
+    <label for="template"><b>Choose a template:</b></label>
     <select id="template" onchange="loadCustomTemplate()">
         <option value="/templates/1.png">Template 1</option>
         <option value="/templates/2.png">Template 2</option>
@@ -49,13 +49,23 @@
         <option value="/templates/25.png">Template 25</option>
     </select>
     <input type="file" id="customTemplateInput" accept="image/*">
-    <button onclick="uploadCustomTemplate()"><b>Upload Template</b></button>
-    <br><br>
+    <button onclick="uploadCustomTemplate()">Upload Template</button>
+    <br>
     <span style="font-size: 20px;">(After uploading check the last option of the drop down menu above for the uploaded template)</span>
     <br><br>
     <canvas id="imageCanvas" width="800" height="600"></canvas>
     <br>
-    <label for="fontSize"><b>Font Size</b></label>
+    <label for="descriptionInput"><b>Description:</b></label>
+    <textarea id="descriptionInput" rows="4"></textarea>
+    <br>
+    <label for="dateInput"><b>Date:</b></label>
+    <input type="text" id="dateInput">
+    <br>
+    <label for="signInput"><b>Sign:</b></label>
+    <input type="text" id="signInput">
+    <br>
+    <br>
+    <label for="fontSize"><b>Font Size:</b></label>
     <input type="number" id="fontSize" min="8" max="72" value="16">
     <br><br>
     <label for="fontColor"><b>Font Color</b></label>
@@ -64,8 +74,8 @@
     <label for="fontWeight"><b>Bold</b></label>
     <input type="checkbox" id="fontWeight">
     <br><br>
-    <label for="fontFamily"><b>Font Family</b></label>
-    <select id="fontFamily" style="width: 150px;">
+    <label for="fontFamily"><b>Font Family:</b></label>
+    <select id="fontFamily">
         <option value="Arial">Arial</option>
         <option value="Times New Roman">Times New Roman</option>
         <option value="Courier New">Courier New</option>
@@ -82,50 +92,40 @@
         <option value="Lucida">Lucida</option>
         <option value="Calibri">Calibri</option>
     </select>
-    <br>
-    <br>
-    <label for="descriptionInput"><b>Description</b></label>
-    <br>
-    <br>
-    <textarea id="descriptionInput" rows="4"></textarea>
-    <br>
-    <br>
-    <label for="dateInput"><b>Date</b></label>
-    <input type="text" id="dateInput">
-    <br>
-    <br>
-    <label for="signInput"><b>Sign</b></label>
-    <input type="text" id="signInput">
-    <br>
-    <br>
-    <span style="font-size: 20px;">Upload sign after removing background
-    <br><a href="https://www.photoroom.com/tools/background-remover" target="_blank">Click Here For Background Removal</a>
+    <span style="font-size: 20px;">(Upload sign after removing background.
+    <br><a href="https://www.photoroom.com/tools/background-remover" target="_blank">Click Here For Background Removal</a>)
     </span>
     <br>
     <br>
-    <label for="imageFileInput1"><b>Sign 1</b></label>
+    <label for="imageFileInput1"><b>Sign 1:</b></label>
     <input type="file" id="imageFileInput1" accept="image/*">
-    <button class="custom-button" onclick="uploadImage('imageFileInput1')"><b>Add Sign 1 Image</b></button>
     <br>
     <br>
-    <label for="imageFileInput2"><b>Sign 2</b></label>
+    <label for="imageFileInput2"><b>Sign 2:</b></label>
     <input type="file" id="imageFileInput2" accept="image/*">
-    <button class="custom-button" onclick="uploadImage('imageFileInput2')"><b>Add Sign 2 Image</b></button>
     <br>
     <br>
-    <label for="logoFileInput"><b>Logo</b></label>
+    <label for="logoFileInput"><b>Logo:</b></label>
     <input type="file" id="logoFileInput" accept="image/*">
-    <button class="custom-button" onclick="uploadImage('logoFileInput')"><b>Add Logo Image</b></button>
     <br>
     <br>
-    <div class="button-container">
-        <button class="custom-button" onclick="addText('description')"><b>Add Description</b></button>
-        <button class="custom-button" onclick="addText('date')"><b>Add Date</b></button>
-        <button class="custom-button" onclick="addText('sign')"><b>Add Sign</b></button>
-        <button class="custom-button" onclick="undoLastOperation()"><b>Undo</b></button>
-        <button class="custom-button" onclick="saveImage('png', 1)"><b>Save as PNG</b></button>
-        <button class="custom-button" onclick="saveImage('jpeg', 0.8)"><b>Save as JPG</b></button>
-    </div>
+    <button onclick="addText('description')"><b>Add Description</b></button>
+    <button onclick="addText('date')"><b>Add Date</b></button>
+    <button onclick="addText('sign')"><b>Add Sign</b></button>
+    <br>
+    <br>
+    <button onclick="uploadImage('imageFileInput1')"><b>Add Sign 1 Image</b></button>
+    <button onclick="uploadImage('imageFileInput2')"><b>Add Sign 2 Image</b></button>
+    <button onclick="uploadImage('logoFileInput')"><b>Add Logo Image</b></button>
+    <br>
+    <br>
+    <button onclick="undoLastOperation()"><b>Undo</b></button>
+    <br>
+    <br>
+    <button onclick="saveImage('png', 1)"><b>Save as PNG</b></button>
+    <button onclick="saveImage('jpeg', 0.8)"><b>Save as JPG</b></button>
+
+   
     <script>
         const canvas = document.getElementById('imageCanvas');
         const ctx = canvas.getContext('2d');
@@ -221,7 +221,6 @@
         }
 
 
-
         function saveImage(format, quality) {
             const canvas = document.getElementById('imageCanvas');
             const imageData = canvas.toDataURL(`image/${format}`, quality); // Set format and quality
@@ -303,7 +302,8 @@
 
         let draggingImage = null;
 
-        // Add event listener for mouse down on the canvas
+// Add event listener for mouse down on the canvas
+
         function handleImageDragging(e) {
             const mouseX = e.clientX - canvas.getBoundingClientRect().left;
             const mouseY = e.clientY - canvas.getBoundingClientRect().top;
@@ -324,6 +324,9 @@
                 }
             });
         }
+
+
+        // Add event listener for mouse down on the canvas
         canvas.addEventListener('mousedown', function (e) {
             const mouseX = e.clientX - canvas.getBoundingClientRect().left;
             const mouseY = e.clientY - canvas.getBoundingClientRect().top;
@@ -341,38 +344,26 @@
                         prevX = mouseX - text.x;
                         prevY = mouseY - text.y;
                     }
+                } else if (text.type === 'text') {
+                    if (
+                        mouseX >= text.x &&
+                        mouseX <= text.x + ctx.measureText(text.text).width &&
+                        mouseY >= text.y - parseInt(text.fontSize) &&
+                        mouseY <= text.y
+                    ) {
+                        isDragging = true;
+                        selectedText = text;
+                        prevX = mouseX - text.x;
+                        prevY = mouseY - text.y;
+                    }
                 }
             });
         });
 
         // Add event listener for mouse up on the canvas
-        canvas.addEventListener('mouseup', function (e) {
-            if (isDragging && selectedText !== null) {
-                isDragging = false;
-                selectedText = null;
-            } else {
-                // Check if there is a selected image to fix
-                const mouseX = e.clientX - canvas.getBoundingClientRect().left;
-                const mouseY = e.clientY - canvas.getBoundingClientRect().top;
-
-                texts.forEach(text => {
-                    if (text.type === 'image' && selectedText === null) {
-                        if (
-                            mouseX >= text.x &&
-                            mouseX <= text.x + text.width &&
-                            mouseY >= text.y &&
-                            mouseY <= text.y + text.height
-                        ) {
-                            selectedText = text;
-                            // Set new fixed coordinates for the image
-                            selectedText.x = mouseX - prevX;
-                            selectedText.y = mouseY - prevY;
-                            // Redraw canvas with updated image position
-                            loadTemplate();
-                        }
-                    }
-                });
-            }
+        canvas.addEventListener('mouseup', function () {
+            isDragging = false;
+            selectedText = null;
         });
 
         // Add event listener for mouse move on the canvas
@@ -384,7 +375,7 @@
                 selectedText.x = mouseX - prevX;
                 selectedText.y = mouseY - prevY;
 
-                loadTemplate(); // Redraw canvas with updated image position
+                loadTemplate(); // Redraw canvas with updated text and image positions
             }
         });
 
