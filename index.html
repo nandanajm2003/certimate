@@ -9,10 +9,12 @@
 <div class="transparent-container">
   <div class="header">
     <div class="logo-container">
-      <img src="logo.jpg"  srcset="logo_2x.jpg 2x,logo_3x.jpg 3x" alt="Certimate Logo" >
+      <img src="logo.jpg"  srcset="
+      logo_2x.jpg 2x, 
+      logo_3x.jpg 3x"alt="Certimate Logo" >
     </div>
-    <h1>CERTIMATE</h1>
-  </div>
+    <h1>CERTIMATE</h1> 
+    </div>
     <hr class="partition-line">
     <div class="options">
       <button onclick="location.href='index.html'">Home</button>
@@ -29,23 +31,54 @@
     <span style=text-align:center;font-weight:bold;font-size:larger> Welcome to CERTIMATE! </span>
     <br>
     <br>Introducing Certimate, the automatic certificate generator. Say goodbye to the hassle of 
-    <br> manually creating certificates for your events, workshops, or training programs. With Certimate, 
+    <br>manually creating certificates for your events, workshops, or training programs. With Certimate, 
     <br>you can effortlessly generate professional-looking certificates in just a few clicks, saving you time and effort. 
     <br>Streamline your certificate creation process and elevate the professionalism of your organization with Certimate.
     <br>
     </div> 
+    </strong>
+    </div>
+    <button class="collapsible"><b>HOW TO USE CERTIMATE?</b></button>
+    <div class="content">
+      <br>Let's guide you through the working:
+      <br>
+      <br><b>Edit template:</b> You can select a select a template either from the 
+      templates available in the drop down menu or upload your own template. Then add in your
+      event description, dates, sign description in desried font type,color and size and upload logo and sign. 
+      To place the description or images in the desired position just drag the inserted text/image in the canva 
+      and fix the position. After editing you can download the image in the available formats.
+      <br>
+      <br><b>Generate Certificates:</b> If u already have a edited template you can jump right onto generating the
+      certificates. Select the excel file to extract names from and select a template and upload both.
+      After uploading, select coordinates where you want the name to be printed, in the desired font type, color,
+      size etc. Then generate the certificates and download it in any of the available formats.
+      <br>
+      <br><b>Feedback:</b> Send us your feedbacks and suggestions to improve certimate! 
+      <br>
+      <br>
+    </div>
     <br>
     <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-
-  </strong>
-  </div>
 </div>
   </p>
 </header>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+  });
+</script>
 </body>
 </html>
