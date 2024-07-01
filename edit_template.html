@@ -140,7 +140,7 @@
             templateImage.onload = function () {
                 const aspectRatio = templateImage.width / templateImage.height;
                 let newWidth, newHeight;
-
+        
                 if (aspectRatio > canvas.width / canvas.height) {
                     newWidth = canvas.width;
                     newHeight = canvas.width / aspectRatio;
@@ -148,51 +148,70 @@
                     newWidth = canvas.height * aspectRatio;
                     newHeight = canvas.height;
                 }
-
+        
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(templateImage, 0, 0, newWidth, newHeight);
                 texts.forEach(text => {
                     ctx.font = text.fontSize + ' ' + text.fontFamily;
-                    ctx.fillStyle = 'black';
+                    ctx.fillStyle = text.fontColor; // Set text color
                     ctx.fillText(text.text, text.x, text.y);
                 });
             };
             templateImage.src = template;
         }
+
         function uploadCustomTemplate() {
             const customTemplateInput = document.getElementById('customTemplateInput');
             const uploadedTemplate = customTemplateInput.files[0];
-
+        
             if (!uploadedTemplate) {
                 alert('Please select a template file.');
                 return;
             }
-
+        
             const reader = new FileReader();
             reader.onload = function (e) {
-                const template = e.target.result;
-
-                // Add the custom template to the dropdown menu
-                const option = document.createElement('option');
-                option.value = template;
-                option.text = 'Custom Template ' + (document.getElementById('template').options.length + 1); // Next template number
-                document.getElementById('template').add(option);
+                const templateDataURL = e.target.result;
+                const templateSelect = document.getElementById('template');
+                const customOption = document.createElement('option');
+                customOption.value = templateDataURL;
+                customOption.text = 'Custom Template';
+                templateSelect.appendChild(customOption);
+                templateSelect.value = templateDataURL;
+                loadTemplate(); // Load the custom template onto the canvas
             };
             reader.readAsDataURL(uploadedTemplate);
         }
 
-        function loadCustomTemplate() {
-            const customTemplate = document.getElementById('template').value;
 
-            // Load the custom template in the canvas
-            const customTemplateImage = new Image();
-            customTemplateImage.onload = function () {
-                // Draw the custom template on the canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(customTemplateImage, 0, 0, canvas.width, canvas.height);
-                // Additional code to handle other elements on the canvas if needed
-            };
-            customTemplateImage.src = customTemplate;
+        function loadCustomTemplate() {
+            const template = document.getElementById('template').value;
+            if (template.startsWith('data:image/')) {
+                const templateImage = new Image();
+                templateImage.onload = function () {
+                    const aspectRatio = templateImage.width / templateImage.height;
+                    let newWidth, newHeight;
+        
+                    if (aspectRatio > canvas.width / canvas.height) {
+                        newWidth = canvas.width;
+                        newHeight = canvas.width / aspectRatio;
+                    } else {
+                        newWidth = canvas.height * aspectRatio;
+                        newHeight = canvas.height;
+                    }
+        
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(templateImage, 0, 0, newWidth, newHeight);
+                    texts.forEach(text => {
+                        ctx.font = text.fontSize + ' ' + text.fontFamily;
+                        ctx.fillStyle = text.fontColor; // Set text color
+                        ctx.fillText(text.text, text.x, text.y);
+                    });
+                };
+                templateImage.src = template;
+            } else {
+                loadTemplate();
+            }
         }
 
 
