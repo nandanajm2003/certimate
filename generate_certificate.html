@@ -6,7 +6,9 @@
     <title>Generate Certificate</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <link href='https://fonts.googleapis.com/css?family=Parisienne' rel='stylesheet'>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 <body>
@@ -197,33 +199,35 @@
             image.src = URL.createObjectURL(templateImage);
         }
 
-        function downloadCertificates() {
-            if (certificatesData.length === 0) {
-                alert('No certificates generated yet.');
-                return;
-            }
-
-            const zip = new JSZip();
-            const folder = zip.folder('Certificates');
-            const downloadFormat = document.getElementById('downloadFormat').value;
-
-            certificatesData.forEach(({ name, imageData }, index) => {
-                let filename;
-                if (downloadFormat === 'pdf') {
-                    filename = `${name}_${index + 1}.pdf`;
-                    // Generate PDF for each certificate and add to zip folder
-                    const pdf = new jsPDF();
-                    pdf.addImage(imageData, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-                    const pdfData = pdf.output('blob');
-                    folder.file(filename, pdfData, { base64: false });
-                } else if (downloadFormat === 'jpg') {
-                    filename = `${name}_${index + 1}.jpg`;
-                    folder.file(filename, imageData.split('base64,')[1], { base64: true });
+        async function downloadCertificates() {
+                if (certificatesData.length === 0) {
+                    alert('No certificates generated yet.');
+                    return;
                 }
-            });
 
-            zip.generateAsync({ type: 'blob' })
-                .then(function (content) {
+                const zip = new JSZip();
+                const folder = zip.folder('Certificates');
+                const downloadFormat = document.getElementById('downloadFormat').value;
+
+                if (downloadFormat === 'pdf') {
+                    const { jsPDF } = window.jspdf;
+                    for (const { name, imageData } of certificatesData) {
+                        const pdf = new jsPDF();
+                        const imgProps = pdf.getImageProperties(imageData);
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                        pdf.addImage(imageData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                        const pdfBlob = pdf.output('blob');
+                        folder.file(`${name}.pdf`, pdfBlob);
+                    }
+                } else if (downloadFormat === 'jpg') {
+                    for (const { name, imageData } of certificatesData) {
+                        folder.file(`${name}.jpg`, imageData.split('base64,')[1], { base64: true });
+                    }
+                }
+
+                zip.generateAsync({ type: 'blob' }).then(function (content) {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(content);
                     link.download = 'Certificates.zip';
@@ -231,7 +235,7 @@
                     link.click();
                     document.body.removeChild(link);
                 });
-        }
+            }
 
 
     </script>
