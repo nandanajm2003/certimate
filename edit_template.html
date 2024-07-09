@@ -317,6 +317,9 @@
                 }
             });
         }
+
+
+        // Add event listener for mouse down on the canvas
         canvas.addEventListener('mousedown', function (e) {
             const mouseX = e.clientX - canvas.getBoundingClientRect().left;
             const mouseY = e.clientY - canvas.getBoundingClientRect().top;
@@ -334,38 +337,26 @@
                         prevX = mouseX - text.x;
                         prevY = mouseY - text.y;
                     }
+                } else if (text.type === 'text') {
+                    if (
+                        mouseX >= text.x &&
+                        mouseX <= text.x + ctx.measureText(text.text).width &&
+                        mouseY >= text.y - parseInt(text.fontSize) &&
+                        mouseY <= text.y
+                    ) {
+                        isDragging = true;
+                        selectedText = text;
+                        prevX = mouseX - text.x;
+                        prevY = mouseY - text.y;
+                    }
                 }
             });
         });
 
         // Add event listener for mouse up on the canvas
-        canvas.addEventListener('mouseup', function (e) {
-            if (isDragging && selectedText !== null) {
-                isDragging = false;
-                selectedText = null;
-            } else {
-                // Check if there is a selected image to fix
-                const mouseX = e.clientX - canvas.getBoundingClientRect().left;
-                const mouseY = e.clientY - canvas.getBoundingClientRect().top;
-
-                texts.forEach(text => {
-                    if (text.type === 'image' && selectedText === null) {
-                        if (
-                            mouseX >= text.x &&
-                            mouseX <= text.x + text.width &&
-                            mouseY >= text.y &&
-                            mouseY <= text.y + text.height
-                        ) {
-                            selectedText = text;
-                            // Set new fixed coordinates for the image
-                            selectedText.x = mouseX - prevX;
-                            selectedText.y = mouseY - prevY;
-                            // Redraw canvas with updated image position
-                            loadTemplate();
-                        }
-                    }
-                });
-            }
+        canvas.addEventListener('mouseup', function () {
+            isDragging = false;
+            selectedText = null;
         });
 
         // Add event listener for mouse move on the canvas
@@ -377,7 +368,7 @@
                 selectedText.x = mouseX - prevX;
                 selectedText.y = mouseY - prevY;
 
-                loadTemplate(); // Redraw canvas with updated image position
+                loadTemplate(); // Redraw canvas with updated text and image positions
             }
         });
 
