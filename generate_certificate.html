@@ -157,47 +157,52 @@
         }
 
         async function generateCertificate() {
-            const xCoord = parseInt(document.getElementById('xCoord').value);
-            const yCoord = parseInt(document.getElementById('yCoord').value);
-            const fontSize = parseInt(document.getElementById('fontSize').value);
-            const fontFamily = document.getElementById('fontFamily').value;
-            const fontColor = document.getElementById('fontColor').value;
-            const fontWeight = document.getElementById('fontWeight').checked ? 'bold' : 'normal'; // Check if bold checkbox is checked
+                const xCoord = parseInt(document.getElementById('xCoord').value);
+                const yCoord = parseInt(document.getElementById('yCoord').value);
+                const fontSize = parseInt(document.getElementById('fontSize').value);
+                const fontFamily = document.getElementById('fontFamily').value;
+                const fontColor = document.getElementById('fontColor').value;
+                const fontWeight = document.getElementById('fontWeight').checked ? 'bold' : 'normal'; // Check if bold checkbox is checked
 
-            if (isNaN(xCoord) || isNaN(yCoord) || isNaN(fontSize) || !templateImage) {
-                alert('Please provide valid input values and upload an image.');
-                return;
+                if (isNaN(xCoord) || isNaN(yCoord) || isNaN(fontSize) || !templateImage) {
+                    alert('Please provide valid input values and upload an image.');
+                    return;
+                }
+
+                certificatesData = []; // Clear previous certificates data
+
+                const image = new Image();
+                image.onload = async function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = image.width;
+                    canvas.height = image.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
+                    ctx.fillStyle = fontColor; // Apply font color
+                    namesData.forEach((name, index) => {
+                        const templateCanvas = document.createElement('canvas');
+                        templateCanvas.width = canvas.width;
+                        templateCanvas.height = canvas.height;
+                        const templateCtx = templateCanvas.getContext('2d');
+                        templateCtx.drawImage(image, 0, 0, templateCanvas.width, templateCanvas.height);
+                        templateCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
+                        templateCtx.fillStyle = fontColor; // Apply font color
+                        
+                        // Measure the text width and adjust the x-coordinate
+                        const textWidth = templateCtx.measureText(name).width;
+                        const centeredXCoord = xCoord - (textWidth / 2);
+
+                        templateCtx.fillText(name, centeredXCoord, yCoord); // Center the text
+                        const imageData = templateCanvas.toDataURL('image/jpeg', 1);
+                        certificatesData.push({ name, imageData }); // Store certificate data
+                    });
+                    alert('Certificates generated successfully.');
+                };
+
+                image.src = URL.createObjectURL(templateImage);
             }
 
-            certificatesData = []; // Clear previous certificates data
-
-            const image = new Image();
-            image.onload = async function () {
-                const canvas = document.createElement('canvas');
-                canvas.width = image.width;
-                canvas.height = image.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
-                ctx.fillStyle = fontColor; // Apply font color
-                namesData.forEach((name, index) => {
-                    const templateCanvas = document.createElement('canvas');
-                    templateCanvas.width = canvas.width;
-                    templateCanvas.height = canvas.height;
-                    const templateCtx = templateCanvas.getContext('2d');
-                    templateCtx.drawImage(image, 0, 0, templateCanvas.width, templateCanvas.height);
-                    templateCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
-                    templateCtx.fillStyle = fontColor; // Apply font color
-                    templateCtx.fillText(name, xCoord, yCoord); // Fixed coordinates for each name
-                    const imageData = templateCanvas.toDataURL('image/jpeg', 1);
-                    certificatesData.push({ name, imageData }); // Store certificate data
-                });
-                alert('Certificates generated successfully.');
-            };
-
-            // Use the uploaded image as the template image
-            image.src = URL.createObjectURL(templateImage);
-        }
 
         async function downloadCertificates() {
                 if (certificatesData.length === 0) {
