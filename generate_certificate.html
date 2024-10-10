@@ -9,7 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <style>
+        @font-face {
+            font-family: 'Parisienne';
+            src: url('data:font/woff2;charset=utf-8;base64,...') format('woff2'); 
+        }
+        </style>        
 </head>
 <body>
     <div class="transparent-container">
@@ -157,51 +162,62 @@
         }
 
         async function generateCertificate() {
-                const xCoord = parseInt(document.getElementById('xCoord').value);
-                const yCoord = parseInt(document.getElementById('yCoord').value);
-                const fontSize = parseInt(document.getElementById('fontSize').value);
-                const fontFamily = document.getElementById('fontFamily').value;
-                const fontColor = document.getElementById('fontColor').value;
-                const fontWeight = document.getElementById('fontWeight').checked ? 'bold' : 'normal'; // Check if bold checkbox is checked
+    const xCoord = parseInt(document.getElementById('xCoord').value);
+    const yCoord = parseInt(document.getElementById('yCoord').value);
+    const fontSize = parseInt(document.getElementById('fontSize').value);
+    const fontFamily = document.getElementById('fontFamily').value;
+    const fontColor = document.getElementById('fontColor').value;
+    const fontWeight = document.getElementById('fontWeight').checked ? 'bold' : 'normal'; // Check if bold checkbox is checked
 
-                if (isNaN(xCoord) || isNaN(yCoord) || isNaN(fontSize) || !templateImage) {
-                    alert('Please provide valid input values and upload an image.');
-                    return;
-                }
+    if (isNaN(xCoord) || isNaN(yCoord) || isNaN(fontSize) || !templateImage) {
+        alert('Please provide valid input values and upload an image.');
+        return;
+    }
 
-                certificatesData = []; // Clear previous certificates data
+    certificatesData = []; // Clear previous certificates data
 
-                const image = new Image();
-                image.onload = async function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
-                    ctx.fillStyle = fontColor; // Apply font color
-                    namesData.forEach((name, index) => {
-                        const templateCanvas = document.createElement('canvas');
-                        templateCanvas.width = canvas.width;
-                        templateCanvas.height = canvas.height;
-                        const templateCtx = templateCanvas.getContext('2d');
-                        templateCtx.drawImage(image, 0, 0, templateCanvas.width, templateCanvas.height);
-                        templateCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; // Apply font weight
-                        templateCtx.fillStyle = fontColor; // Apply font color
-                        
-                        // Measure the text width and adjust the x-coordinate
-                        const textWidth = templateCtx.measureText(name).width;
-                        const centeredXCoord = xCoord - (textWidth / 2);
+    const image = new Image();
+    image.onload = async function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        
+        // Set the font style
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; 
+        ctx.fillStyle = fontColor; 
 
-                        templateCtx.fillText(name, centeredXCoord, yCoord); // Center the text
-                        const imageData = templateCanvas.toDataURL('image/jpeg', 1);
-                        certificatesData.push({ name, imageData }); // Store certificate data
-                    });
-                    alert('Certificates generated successfully.');
-                };
+        // Generate certificates for each name
+        namesData.forEach((name) => {
+            const templateCanvas = document.createElement('canvas');
+            templateCanvas.width = canvas.width;
+            templateCanvas.height = canvas.height;
+            const templateCtx = templateCanvas.getContext('2d');
+            templateCtx.drawImage(image, 0, 0, templateCanvas.width, templateCanvas.height);
+            
+            // Set the font style again for the new canvas
+            templateCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`; 
+            templateCtx.fillStyle = fontColor; 
+            
+            // Measure the text width
+            const textWidth = templateCtx.measureText(name).width;
+            
+            // Calculate centered X coordinate
+            const centeredXCoord = xCoord - (textWidth / 2);
 
-                image.src = URL.createObjectURL(templateImage);
-            }
+            // Draw the name at the centered position
+            templateCtx.fillText(name, centeredXCoord, yCoord); 
+            const imageData = templateCanvas.toDataURL('image/jpeg', 1);
+            certificatesData.push({ name, imageData }); // Store certificate data
+        });
+
+        alert('Certificates generated successfully.');
+    };
+
+    image.src = URL.createObjectURL(templateImage);
+}
+
 
 
         async function downloadCertificates() {
